@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FairyFun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div id="game"></div>
+
+  <!-- Title Screen -->
+  <div id="title-screen">
+    <div class="title-content">
+      <h1 class="game-title">FairyFun</h1>
+      <p class="game-subtitle">A Magical Forest Game</p>
+      <button id="play-btn" class="big-btn">Play!</button>
+    </div>
+  </div>
+
+  <!-- Intro Sequence -->
+  <div id="intro-screen" class="hidden">
+    <div class="intro-content">
+      <p id="intro-text" class="intro-text"></p>
+      <button id="intro-next-btn" class="big-btn">Next</button>
+    </div>
+  </div>
+
+  <!-- Dialogue Bubble -->
+  <div id="dialogue" class="hidden">
+    <div class="bubble">
+      <p class="speaker"></p>
+      <p class="text"></p>
+      <button class="next-btn">Tap to go on &gt;</button>
+    </div>
+  </div>
+
+  <!-- Inventory Bar -->
+  <div id="inventory" class="hidden">
+    <div class="slot" data-index="0"></div>
+    <div class="slot" data-index="1"></div>
+    <div class="slot" data-index="2"></div>
+    <div class="slot" data-index="3"></div>
+  </div>
+
+  <!-- Mailbox Letter -->
+  <div id="mailbox-letter" class="hidden">
+    <div class="letter-content">
+      <p class="letter-text"></p>
+      <button class="big-btn" id="letter-close-btn">OK!</button>
+    </div>
+  </div>
+
+  <!-- Puzzle Overlay -->
+  <div id="puzzle-overlay" class="hidden"></div>
+
+  <!-- Area Label -->
+  <div id="area-label" class="hidden"></div>
+
+  <!-- Navigation Arrows -->
+  <div id="nav-arrows" class="hidden"></div>
+
+  <!-- Orientation Warning -->
+  <div id="rotate-warning" class="hidden">
+    <p>Please turn your screen sideways! 📱↔️</p>
+  </div>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <p>Loading... ✨</p>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
