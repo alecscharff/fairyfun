@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { scene, camera, raycaster, pointer } from './engine.js';
+import { scene, camera, renderer, raycaster, pointer } from './engine.js';
 import { getGroundMesh, interactiveObjects, handleAreaInteraction } from './areas.js';
 import { isDialogueOpen, showDialogue } from './dialogue.js';
 import { handleNPCInteraction, getSpawnedItems, pickUpItem } from './quests.js';
@@ -201,22 +201,5 @@ function onPointerDown(e) {
   }
 }
 
-// Use renderer's canvas for pointer events
-const canvas = document.querySelector('#game canvas');
-if (canvas) {
-  canvas.addEventListener('pointerdown', onPointerDown);
-} else {
-  // Canvas might not exist yet, defer
-  const observer = new MutationObserver(() => {
-    const c = document.querySelector('#game canvas');
-    if (c) {
-      c.addEventListener('pointerdown', onPointerDown);
-      observer.disconnect();
-    }
-  });
-  observer.observe(document.getElementById('game'), { childList: true });
-}
-
-// Also attach directly to ensure it works
-import { renderer as r } from './engine.js';
-r.domElement.addEventListener('pointerdown', onPointerDown);
+// Attach once to the renderer's canvas (already imported above)
+renderer.domElement.addEventListener('pointerdown', onPointerDown);

@@ -269,21 +269,29 @@ export async function buildArea(areaId, entryDir) {
   currentAreaId = areaId;
   fromDirection = entryDir || null;
 
-  // Clear scene (keep lights and camera)
+  // Clear scene: only remove top-level area props/NPCs, never touch the player (lisa) or particles
   const toRemove = [];
   scene.traverse((child) => {
-    if (child.isMesh || child.isGroup) {
+    if (child.name === 'lisa') return; // skip player and all descendants
+    if (child instanceof THREE.Points) return; // skip particle system
+    if ((child.isMesh || child.isGroup) && child.parent === scene) {
       toRemove.push(child);
     }
   });
   toRemove.forEach((obj) => {
-    if (obj.parent) obj.parent.remove(obj);
-    if (obj.geometry) obj.geometry.dispose();
-    if (obj.material) {
-      if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose());
-      else obj.material.dispose();
-    }
+    scene.remove(obj);
+    // Dispose geometry/materials only on leaf meshes to avoid double-dispose
+    obj.traverse((child) => {
+      if (child.isMesh) {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) {
+          if (Array.isArray(child.material)) child.material.forEach((m) => m.dispose());
+          else child.material.dispose();
+        }
+      }
+    });
   });
+  areaObjects = [];
   interactiveObjects = [];
 
   const areaDef = AREAS[areaId];
