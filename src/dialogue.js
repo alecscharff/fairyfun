@@ -31,15 +31,12 @@ function playAudioFile(text, audioKey) {
 
   if (!url) return false;
 
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.src = '';
-    currentAudio = null;
-  }
-
   const audio = new Audio(url);
   currentAudio = audio;
   isSpeaking = true;
+
+  // Guard against both error event and play().catch() both firing
+  let fallbackTriggered = false;
 
   audio.addEventListener('ended', () => {
     isSpeaking = false;
@@ -47,14 +44,16 @@ function playAudioFile(text, audioKey) {
   });
 
   audio.addEventListener('error', () => {
-    // File not yet generated, fall back to Web Speech
+    if (fallbackTriggered) return;
+    fallbackTriggered = true;
     isSpeaking = false;
     currentAudio = null;
     speakFallback(text);
   });
 
   audio.play().catch(() => {
-    // Autoplay blocked or file missing, fall back
+    if (fallbackTriggered) return;
+    fallbackTriggered = true;
     speakFallback(text);
   });
 
@@ -77,6 +76,17 @@ function speakFallback(text) {
 }
 
 export function speak(text, audioKey) {
+  // Stop everything before starting new speech
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = '';
+    currentAudio = null;
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  isSpeaking = false;
+
   const usedFile = playAudioFile(text, audioKey);
   if (!usedFile) {
     speakFallback(text);
