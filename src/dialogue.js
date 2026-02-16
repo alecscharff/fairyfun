@@ -1,9 +1,13 @@
 // Speech bubble dialogue system with TTS
+// Uses pre-generated OpenAI audio when available, falls back to Web Speech API.
+
+import { AUDIO, TEXT_TO_KEY } from './audioManifest.js';
 
 let currentLines = [];
 let currentIndex = 0;
 let onCompleteCallback = null;
 let isSpeaking = false;
+let currentAudio = null;
 
 const dialogueEl = document.getElementById('dialogue');
 const speakerEl = dialogueEl.querySelector('.speaker');
@@ -15,15 +19,80 @@ nextBtn.addEventListener('pointerdown', (e) => {
   advanceLine();
 });
 
-function speak(text) {
+/**
+ * Try to play a pre-generated MP3 audio file.
+ * Returns true if audio started, false if not available.
+ */
+function playAudioFile(text, audioKey) {
+  // Look up by explicit key first, then by cleaned text
+  const cleanedText = text.replace(/[^\w\s'!?.,]/g, '').trim().toLowerCase();
+  const key = audioKey || TEXT_TO_KEY[cleanedText];
+  const url = key ? AUDIO[key] : null;
+
+  if (!url) return false;
+
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = '';
+    currentAudio = null;
+  }
+
+  const audio = new Audio(url);
+  currentAudio = audio;
+  isSpeaking = true;
+
+  audio.addEventListener('ended', () => {
+    isSpeaking = false;
+    currentAudio = null;
+  });
+
+  audio.addEventListener('error', () => {
+    // File not yet generated, fall back to Web Speech
+    isSpeaking = false;
+    currentAudio = null;
+    speakFallback(text);
+  });
+
+  audio.play().catch(() => {
+    // Autoplay blocked or file missing, fall back
+    speakFallback(text);
+  });
+
+  return true;
+}
+
+/**
+ * Web Speech API fallback (browser built-in TTS).
+ */
+function speakFallback(text) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text.replace(/[^\w\s!?.,']/g, ''));
   utterance.rate = 0.85;
-  utterance.pitch = 1.1;
+  utterance.pitch = 1.15;
+  utterance.volume = 1;
   utterance.onend = () => { isSpeaking = false; };
   isSpeaking = true;
   window.speechSynthesis.speak(utterance);
+}
+
+function speak(text, audioKey) {
+  const usedFile = playAudioFile(text, audioKey);
+  if (!usedFile) {
+    speakFallback(text);
+  }
+}
+
+function stopSpeaking() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = '';
+    currentAudio = null;
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  isSpeaking = false;
 }
 
 function showLine() {
@@ -34,14 +103,11 @@ function showLine() {
   const line = currentLines[currentIndex];
   speakerEl.textContent = line.speaker || '';
   textEl.textContent = line.text;
-  speak(line.text);
+  speak(line.text, line.audioKey);
 }
 
 function advanceLine() {
-  if (isSpeaking) {
-    window.speechSynthesis.cancel();
-    isSpeaking = false;
-  }
+  stopSpeaking();
   currentIndex++;
   if (currentIndex >= currentLines.length) {
     closeDialogue();
@@ -51,6 +117,7 @@ function advanceLine() {
 }
 
 function closeDialogue() {
+  stopSpeaking();
   dialogueEl.classList.add('hidden');
   currentLines = [];
   currentIndex = 0;
@@ -63,7 +130,8 @@ function closeDialogue() {
 
 /**
  * Show a sequence of dialogue lines.
- * @param {Array<{text: string, speaker?: string}>} lines
+ * Lines can optionally include { audioKey: 'key-name' } to use a specific audio file.
+ * @param {Array<{text: string, speaker?: string, audioKey?: string}>} lines
  * @returns {Promise<void>} resolves when all lines are dismissed
  */
 export function showDialogue(lines) {

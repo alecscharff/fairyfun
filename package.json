@@ -6,12 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-audio": "node scripts/generate-audio.js"
   },
   "dependencies": {
     "three": "^0.170.0"
   },
   "devDependencies": {
+    "openai": "^6.22.0",
     "vite": "^6.0.0"
   }
 }
