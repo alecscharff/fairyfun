@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { scene } from './engine.js';
 import { gameState, saveGame } from './save.js';
 import { QUEST_ORDER, ITEM_EMOJI } from './constants.js';
-import { showDialogue } from './dialogue.js';
+import { showDialogue, speak } from './dialogue.js';
 import { checkForEvening, doEvening } from './daynight.js';
 import { NPC_DEFS } from './npcs.js';
 
@@ -15,6 +15,7 @@ export const QUEST_DEFS = {
     itemLocations: [{ item: 'carrot', area: 'creek', pos: [3, 0.3, -2] }],
     puzzleGate: null,
     mailLetter: "Dear Lisa, 💌\nI lost my carrot! 🥕\nCan you help me find it?\n- Bunny 🐰",
+    mailAudioKey: 'mail-bunny',
     dialogueNotStarted: [
       { text: "Oh no! I lost my carrot! 🥕", speaker: "Bunny 🐰" },
       { text: "Can you help me find it?", speaker: "Bunny 🐰" },
@@ -36,6 +37,7 @@ export const QUEST_DEFS = {
     itemLocations: [{ item: 'gem', area: 'cave', pos: [2, 0.4, 1] }],
     puzzleGate: 'connections',
     mailLetter: "Dear Lisa, 💌\nMy horn gem is gone! 💎\nIt is in the dark cave.\nCan you help me?\n- Unicorn 🦄",
+    mailAudioKey: 'mail-unicorn',
     dialogueNotStarted: [
       { text: "My horn gem is gone! 💎", speaker: "Unicorn 🦄" },
       { text: "It is in the cave. But it is so dark!", speaker: "Unicorn 🦄" },
@@ -62,6 +64,7 @@ export const QUEST_DEFS = {
     ],
     puzzleGate: null,
     mailLetter: "Dear Lisa, 💌\nI need to make a nest! 🪹\nCan you find me 3 twigs? 🌿\n- Bird 🐦",
+    mailAudioKey: 'mail-bird',
     dialogueNotStarted: [
       { text: "I need to make a nest! 🪹", speaker: "Bird 🐦" },
       { text: "Can you find me 3 twigs? 🌿", speaker: "Bird 🐦" },
@@ -86,6 +89,7 @@ export const QUEST_DEFS = {
     itemLocations: [{ item: 'crown', area: 'cave', pos: [-3, 0.3, 2] }],
     puzzleGate: 'memory',
     mailLetter: "Dear Lisa, 💌\nI lost my crown! 👑\nIt is in the cave.\nCan you find it?\n- Frog 🐸",
+    mailAudioKey: 'mail-frog',
     dialogueNotStarted: [
       { text: "I am a frog prince! 🐸", speaker: "Frog 🐸" },
       { text: "But I lost my crown! 👑", speaker: "Frog 🐸" },
@@ -106,6 +110,7 @@ export const QUEST_DEFS = {
     destination: 'glade',
     puzzleGate: 'pattern',
     mailLetter: "Dear Lisa, 💌\nI am lost! 😢\nCan you take me home?\nI live by the big glade.\n- Fox Cub 🦊",
+    mailAudioKey: 'mail-fox',
     dialogueNotStarted: [
       { text: "I am lost! 😢", speaker: "Fox Cub 🦊" },
       { text: "Can you help me get home?", speaker: "Fox Cub 🦊" },
@@ -129,6 +134,7 @@ export const QUEST_DEFS = {
     destination: 'glen',
     puzzleGate: 'sorting',
     mailLetter: "Dear Lisa, 💌\nI can not find my mom! 😢\nShe is in the glen.\nCan you take me to her?\n- Baby Deer 🦌",
+    mailAudioKey: 'mail-deer',
     dialogueNotStarted: [
       { text: "I can not find my mom! 😢", speaker: "Baby Deer 🦌" },
       { text: "She is in the glen.", speaker: "Baby Deer 🦌" },
@@ -197,7 +203,7 @@ export async function handleMailbox() {
   const questDef = QUEST_DEFS[nextQuestId];
 
   // Show letter overlay
-  await showMailLetter(questDef.mailLetter);
+  await showMailLetter(questDef.mailLetter, questDef.mailAudioKey);
 
   // Activate quest
   gameState.quests[nextQuestId] = 'active';
@@ -209,7 +215,7 @@ export async function handleMailbox() {
   ]);
 }
 
-function showMailLetter(text) {
+function showMailLetter(text, audioKey) {
   return new Promise((resolve) => {
     const letterEl = document.getElementById('mailbox-letter');
     const letterText = letterEl.querySelector('.letter-text');
@@ -218,14 +224,7 @@ function showMailLetter(text) {
     letterText.textContent = text;
     letterEl.classList.remove('hidden');
 
-    // TTS
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text.replace(/[^\w\s!?.,']/g, ''));
-      utter.rate = 0.85;
-      utter.pitch = 1.1;
-      window.speechSynthesis.speak(utter);
-    }
+    speak(text, audioKey);
 
     function onClose(e) {
       e.stopPropagation();

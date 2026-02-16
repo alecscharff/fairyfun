@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { scene, camera, renderer, updateMixers } from './engine.js';
 import { INTRO_LINES } from './constants.js';
 import { loadSave, gameState } from './save.js';
-import { showDialogue } from './dialogue.js';
+import { showDialogue, speak } from './dialogue.js';
 import { initAreas, buildArea } from './areas.js';
 import { initPlayer, updatePlayer } from './player.js';
 import { initDayNight } from './daynight.js';
@@ -34,16 +34,7 @@ function showIntroLine() {
     return;
   }
   introText.textContent = INTRO_LINES[introIndex];
-  // TTS
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(
-      INTRO_LINES[introIndex].replace(/[^\w\s!?.,']/g, '')
-    );
-    utter.rate = 0.85;
-    utter.pitch = 1.1;
-    window.speechSynthesis.speak(utter);
-  }
+  speak(INTRO_LINES[introIndex], `intro-0${introIndex + 1}`);
 }
 
 introNextBtn.addEventListener('pointerdown', () => {

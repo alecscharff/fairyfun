@@ -76,7 +76,7 @@ function speakFallback(text) {
   window.speechSynthesis.speak(utterance);
 }
 
-function speak(text, audioKey) {
+export function speak(text, audioKey) {
   const usedFile = playAudioFile(text, audioKey);
   if (!usedFile) {
     speakFallback(text);
