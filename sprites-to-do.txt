@@ -15,6 +15,7 @@ public/models/
   props/      carrot.glb  crown.glb  gem.glb  twig.glb
   environment/ tree.glb  rock.glb  mushroom.glb  bush.glb  flower.glb
   house/      cottage.glb
+  
 3. Use them in code
 The loadModel function in src/engine.js is already wired up — it takes a path relative to public/models/:
 

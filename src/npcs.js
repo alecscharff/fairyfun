@@ -342,12 +342,15 @@ export function updateNPCs(dt, playerPos) {
       const dx = playerPos.x - mesh.position.x;
       const dz = playerPos.z - mesh.position.z;
       const dist = Math.sqrt(dx * dx + dz * dz);
-      const FOLLOW_GAP = 1.2; // stay this far behind Lisa
-      if (dist > FOLLOW_GAP + 0.1) {
-        const speed = 4 * dt;
-        const ratio = (dist - FOLLOW_GAP) / dist;
-        mesh.position.x += dx * ratio * Math.min(speed / dist * dist, 1);
-        mesh.position.z += dz * ratio * Math.min(speed / dist * dist, 1);
+      const FOLLOW_GAP = 1.5; // stay this far behind Lisa
+
+      if (dist > FOLLOW_GAP + 0.2) {
+        const speed = 3; // units per second
+        const moveSpeed = Math.min(speed * dt, dist - FOLLOW_GAP);
+
+        // Normalize direction and move
+        mesh.position.x += (dx / dist) * moveSpeed;
+        mesh.position.z += (dz / dist) * moveSpeed;
         mesh.rotation.y = Math.atan2(dx, dz);
       }
     }
