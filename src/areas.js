@@ -344,9 +344,6 @@ export async function buildArea(areaId, entryDir) {
   const questItemMeshes = spawnQuestItems(areaId);
   interactiveObjects.push(...questItemMeshes);
 
-  // Check escort arrivals
-  await checkEscortArrival(areaId);
-
   // Update UI
   updateAreaLabel(areaDef.name);
   updateNavArrows(areaId);
@@ -417,6 +414,9 @@ async function navigateTo(targetId, fromDir) {
   // Fade out
   fade.style.opacity = '0';
   setTimeout(() => fade.remove(), 300);
+
+  // Check escort arrivals AFTER fade completes (so dialogue is visible)
+  await checkEscortArrival(targetId);
 }
 
 async function navigateToInterior(areaId) {
