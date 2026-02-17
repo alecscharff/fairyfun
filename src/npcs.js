@@ -53,6 +53,16 @@ export const NPC_DEFS = {
     bodyColor: 0xff6600,
     questId: 'fox-home',
   },
+  foxMom: {
+    name: 'Mama Fox 🦊',
+    area: 'glade',
+    pos: [-4, 0, -2],
+    color: 0xff6600,
+    bodyColor: 0xcc5500,
+    questId: null,
+    visibleAfterQuest: 'fox-home',
+    isEscortDest: 'fox-home',
+  },
   deer: {
     name: 'Baby Deer 🦌',
     area: 'bushes',
@@ -60,6 +70,33 @@ export const NPC_DEFS = {
     color: 0xd2691e,
     bodyColor: 0xcd853f,
     questId: 'find-mom',
+  },
+  deerMom: {
+    name: 'Mama Deer 🦌',
+    area: 'glen',
+    pos: [-2, 0, 1],
+    color: 0xb8860b,
+    bodyColor: 0xa0522d,
+    questId: null,
+    visibleAfterQuest: 'find-mom',
+    isEscortDest: 'find-mom',
+  },
+  hedgehog: {
+    name: 'Hedgehog 🦔',
+    area: 'creek',
+    pos: [-3, 0, 3],
+    color: 0x8b7355,
+    bodyColor: 0x6b4226,
+    questId: 'heal-hedgehog',
+  },
+  owl: {
+    name: 'Dr. Owl 🦉',
+    area: 'hospital',
+    pos: [2, 0, 0],
+    color: 0xd2b48c,
+    bodyColor: 0xc4a882,
+    questId: null,
+    isEscortDest: 'heal-hedgehog',
   },
   dragon: {
     name: 'Spark 🐉',
@@ -204,6 +241,107 @@ async function createNPCMesh(def) {
     head.position.y = 0.9;
   }
 
+  if (def === NPC_DEFS.foxMom) {
+    // Larger body for mama fox
+    body.scale.set(1.2, 1, 0.9);
+    head.position.y = 1.2;
+    // Tail
+    const fmTailGeo = new THREE.ConeGeometry(0.18, 0.7, 6);
+    const fmTailMat = new THREE.MeshLambertMaterial({ color: 0xcc5500 });
+    const fmTail = new THREE.Mesh(fmTailGeo, fmTailMat);
+    fmTail.position.set(0, 0.4, -0.6);
+    fmTail.rotation.x = -0.5;
+    group.add(fmTail);
+    const fmTipGeo = new THREE.SphereGeometry(0.1, 6, 6);
+    const fmTipMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const fmTip = new THREE.Mesh(fmTipGeo, fmTipMat);
+    fmTip.position.set(0, 0.12, -0.85);
+    group.add(fmTip);
+  }
+
+  if (def === NPC_DEFS.deerMom) {
+    // Larger body for mama deer
+    body.scale.set(1.3, 1.1, 1.2);
+    head.position.y = 1.3;
+    // Antler-like ears
+    const antGeo = new THREE.CylinderGeometry(0.03, 0.05, 0.4, 4);
+    const antMat = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
+    const antL = new THREE.Mesh(antGeo, antMat);
+    antL.position.set(-0.15, 1.6, 0);
+    antL.rotation.z = 0.3;
+    group.add(antL);
+    const antR = new THREE.Mesh(antGeo, antMat);
+    antR.position.set(0.15, 1.6, 0);
+    antR.rotation.z = -0.3;
+    group.add(antR);
+  }
+
+  if (def === NPC_DEFS.hedgehog) {
+    // Round spiky body
+    body.scale.set(0.9, 0.6, 0.7);
+    body.position.y = 0.35;
+    head.scale.set(0.7, 0.7, 0.7);
+    head.position.set(0, 0.7, 0.25);
+    eyeL.position.set(-0.08, 0.78, 0.42);
+    eyeR.position.set(0.08, 0.78, 0.42);
+    // Spines
+    const spineGeo = new THREE.ConeGeometry(0.04, 0.25, 4);
+    const spineMat = new THREE.MeshLambertMaterial({ color: 0x4a3520 });
+    for (let i = 0; i < 8; i++) {
+      const spine = new THREE.Mesh(spineGeo, spineMat);
+      const angle = (i / 8) * Math.PI * 2;
+      spine.position.set(Math.cos(angle) * 0.3, 0.55, Math.sin(angle) * 0.25 - 0.1);
+      spine.rotation.set(Math.sin(angle) * 0.4, 0, Math.cos(angle) * 0.4);
+      group.add(spine);
+    }
+    // Bandage on paw (shows it's hurt)
+    const bandGeo = new THREE.BoxGeometry(0.15, 0.1, 0.15);
+    const bandMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const band = new THREE.Mesh(bandGeo, bandMat);
+    band.position.set(0.25, 0.15, 0.3);
+    group.add(band);
+  }
+
+  if (def === NPC_DEFS.owl) {
+    // Rounder, wider body
+    body.scale.set(0.9, 1, 0.7);
+    head.scale.set(1.1, 1, 1);
+    head.position.y = 1.15;
+    // Big round eyes
+    eyeL.scale.set(2, 2, 1.5);
+    eyeR.scale.set(2, 2, 1.5);
+    eyeL.position.set(-0.15, 1.2, 0.28);
+    eyeR.position.set(0.15, 1.2, 0.28);
+    // Eye rings (glasses)
+    const ringGeo = new THREE.TorusGeometry(0.1, 0.02, 6, 12);
+    const ringMat = new THREE.MeshLambertMaterial({ color: 0xffd700 });
+    const ringL = new THREE.Mesh(ringGeo, ringMat);
+    ringL.position.set(-0.15, 1.2, 0.3);
+    group.add(ringL);
+    const ringR = new THREE.Mesh(ringGeo, ringMat);
+    ringR.position.set(0.15, 1.2, 0.3);
+    group.add(ringR);
+    // Beak
+    const beakGeo = new THREE.ConeGeometry(0.06, 0.15, 4);
+    const beakMat = new THREE.MeshLambertMaterial({ color: 0xdaa520 });
+    const beak = new THREE.Mesh(beakGeo, beakMat);
+    beak.position.set(0, 1.1, 0.35);
+    beak.rotation.x = Math.PI / 2;
+    group.add(beak);
+    // Doctor hat (white cross on head)
+    const hatGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.12, 12);
+    const hatMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const hat = new THREE.Mesh(hatGeo, hatMat);
+    hat.position.y = 1.5;
+    group.add(hat);
+    const crossH = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.04, 0.04), new THREE.MeshLambertMaterial({ color: 0xff0000 }));
+    crossH.position.y = 1.58;
+    group.add(crossH);
+    const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.2), new THREE.MeshLambertMaterial({ color: 0xff0000 }));
+    crossV.position.y = 1.58;
+    group.add(crossV);
+  }
+
   if (def === NPC_DEFS.dragon) {
     // Wings (larger)
     const dwGeo = new THREE.PlaneGeometry(0.8, 0.6);
@@ -258,6 +396,15 @@ export async function loadNPCsForArea(areaId) {
   // Load all NPCs in parallel
   const npcPromises = [];
   for (const [npcId, def] of Object.entries(NPC_DEFS)) {
+    // Skip mom/destination NPCs unless their escort quest is active or complete
+    if (def.isEscortDest) {
+      const questState = gameState.quests[def.isEscortDest];
+      if (questState !== 'active' && questState !== 'complete') continue;
+    }
+    // Skip NPCs that are only visible after a quest completes (but not escort dest NPCs, handled above)
+    if (def.visibleAfterQuest && !def.isEscortDest) {
+      if (gameState.quests[def.visibleAfterQuest] !== 'complete') continue;
+    }
     // Load NPCs that belong to this area OR are currently escorting
     if (def.area !== areaId && !escortFollowing.has(npcId)) continue;
     npcPromises.push({ npcId, def, meshPromise: createNPCMesh(def) });

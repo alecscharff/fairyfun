@@ -4,7 +4,7 @@ import { gameState, saveGame } from './save.js';
 import { QUEST_ORDER, ITEM_EMOJI } from './constants.js';
 import { showDialogue, speak } from './dialogue.js';
 import { checkForEvening, doEvening } from './daynight.js';
-import { NPC_DEFS, escortFollowing } from './npcs.js';
+import { NPC_DEFS, escortFollowing, getLoadedNPCs } from './npcs.js';
 import { openPuzzle } from './puzzles.js';
 import { updateInventoryUI } from './inventory.js';
 
@@ -58,9 +58,9 @@ export const QUEST_DEFS = {
     giveItem: 'twig',
     requiredCount: 3,
     itemLocations: [
-      { item: 'twig', area: 'hollow', pos: [-2, 0.2, 0] },
-      { item: 'twig', area: 'bushes', pos: [4, 0.2, -1] },
-      { item: 'twig', area: 'meadow', pos: [-3, 0.2, 3] },
+      { item: 'twig', area: 'hollow', pos: [3, 0.3, -1] },
+      { item: 'twig', area: 'bushes', pos: [-1, 0.3, 1] },
+      { item: 'twig', area: 'meadow', pos: [3, 0.3, -1] },
     ],
     puzzleGate: null,
     mailLetter: "Dear Lisa, 💌\nI need to make a nest! 🪹\nCan you find me 3 twigs? 🌿\n- Bird 🐦",
@@ -145,6 +145,31 @@ export const QUEST_DEFS = {
     ],
     dialogueDone: [
       { text: "I am with my mom now! 💚", speaker: "Baby Deer 🦌", audioKey: 'deer-done' },
+    ],
+  },
+  'heal-hedgehog': {
+    npc: 'hedgehog',
+    type: 'escort',
+    destination: 'hospital',
+    puzzleGate: null,
+    mailLetter: "Dear Lisa, 💌\nI hurt my paw! 🩹\nCan you take me to the doctor?\nI am by the creek.\n- Hedgehog 🦔",
+    mailAudioKey: 'mail-hedgehog',
+    dialogueNotStarted: [
+      { text: "Ouch! I hurt my paw! 🩹", speaker: "Hedgehog 🦔", audioKey: 'hedgehog-01' },
+      { text: "I slipped on the wet rocks.", speaker: "Hedgehog 🦔", audioKey: 'hedgehog-02' },
+      { text: "Can you take me to the doctor? 🏥", speaker: "Hedgehog 🦔", audioKey: 'hedgehog-03' },
+    ],
+    dialogueFollowing: [
+      { text: "Thank you! Let's go to the doctor! 🦔", speaker: "Hedgehog 🦔", audioKey: 'hedgehog-follow' },
+    ],
+    dialogueArrived: [
+      { text: "The animal hospital! We made it! 🏥", speaker: "Hedgehog 🦔", audioKey: 'hedgehog-arrived-01' },
+      { text: "Let me take a look at that paw! 🩺", speaker: "Dr. Owl 🦉", audioKey: 'owl-heal-01' },
+      { text: "All better now! Just a little rest! ✨", speaker: "Dr. Owl 🦉", audioKey: 'owl-heal-02' },
+      { text: "Thank you, Lisa! Go home and check the mail! 📬", speaker: "Hedgehog 🦔", audioKey: 'hedgehog-arrived-02' },
+    ],
+    dialogueDone: [
+      { text: "My paw is all better! Thank you! 🦔💚", speaker: "Hedgehog 🦔", audioKey: 'hedgehog-done' },
     ],
   },
 };
@@ -244,6 +269,33 @@ export async function handleNPCInteraction(npcId) {
     return;
   }
 
+  // Mom/destination NPCs
+  if (def.isEscortDest) {
+    const questState = gameState.quests[def.isEscortDest];
+    if (questState === 'complete') {
+      if (npcId === 'owl') {
+        await showDialogue([
+          { text: "Everyone is healthy! Come back any time! 🩺", speaker: def.name },
+        ]);
+      } else {
+        await showDialogue([
+          { text: "Thank you for bringing my baby home! 💚", speaker: def.name },
+        ]);
+      }
+    } else if (questState === 'active') {
+      if (npcId === 'owl') {
+        await showDialogue([
+          { text: "Bring any hurt animals to me! I will help them! 🩺", speaker: def.name },
+        ]);
+      } else {
+        await showDialogue([
+          { text: "Have you seen my little one? Please bring them here! 💜", speaker: def.name },
+        ]);
+      }
+    }
+    return;
+  }
+
   const questId = def.questId;
   if (!questId) return;
 
@@ -316,6 +368,8 @@ async function handleActiveQuestNPC(npcId, questId, questDef) {
     if (!followingNPCs.has(npcId)) {
       followingNPCs.add(npcId);
       escortFollowing.add(npcId);
+      gameState.escortingNPCs = Array.from(followingNPCs);
+      saveGame();
       await showDialogue(questDef.dialogueFollowing);
     } else {
       await showDialogue([
@@ -344,6 +398,7 @@ async function handleDragonInteraction() {
     'frog-crown': "The crown is deep in the cave! 👑",
     'fox-home': "The fox needs to go to the glade! 🦊",
     'find-mom': "The deer mom is in the glen! 🦌",
+    'heal-hedgehog': "The hedgehog is hurt by the creek! Take it to the hospital! 🦔🏥",
   };
 
   await showDialogue([
@@ -430,8 +485,8 @@ function createQuestItemMesh(itemType) {
       mat = new THREE.MeshLambertMaterial({ color: 0x00bfff, emissive: 0x00bfff, emissiveIntensity: 0.7 });
       break;
     case 'twig':
-      geo = new THREE.CylinderGeometry(0.08, 0.08, 0.9, 6);
-      mat = new THREE.MeshLambertMaterial({ color: 0x8b4513, emissive: 0x8b4513, emissiveIntensity: 0.3 });
+      geo = new THREE.CylinderGeometry(0.12, 0.1, 1.2, 6);
+      mat = new THREE.MeshLambertMaterial({ color: 0x6b8e23, emissive: 0x9acd32, emissiveIntensity: 0.6 });
       break;
     case 'crown':
       geo = new THREE.TorusGeometry(0.3, 0.09, 6, 12);
@@ -448,8 +503,8 @@ function createQuestItemMesh(itemType) {
   group.name = 'quest-item';
 
   // Add a bigger, brighter glow ring on ground plane
-  const ringGeo = new THREE.RingGeometry(0.4, 0.6, 24);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.6, side: THREE.DoubleSide });
+  const ringGeo = new THREE.RingGeometry(0.5, 0.8, 24);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.7, side: THREE.DoubleSide });
   const ring = new THREE.Mesh(ringGeo, ringMat);
   ring.rotation.x = -Math.PI / 2;
   ring.position.y = 0.01;
@@ -462,15 +517,36 @@ function createQuestItemMesh(itemType) {
  * Check escort quest completion when entering an area.
  */
 export async function checkEscortArrival(areaId) {
-  for (const npcId of followingNPCs) {
+  // Use a copy since we modify the set during iteration
+  for (const npcId of [...followingNPCs]) {
     const def = NPC_DEFS[npcId];
     if (!def || !def.questId) continue;
     const questDef = QUEST_DEFS[def.questId];
     if (questDef.type !== 'escort') continue;
 
     if (areaId === questDef.destination) {
+      // Move the escort NPC next to the destination NPC if present
+      const loadedNPCs = getLoadedNPCs();
+      const escortMesh = loadedNPCs.get(npcId);
+      // Find the destination NPC (has isEscortDest matching this quest)
+      let destMesh = null;
+      for (const [destId, destDef] of Object.entries(NPC_DEFS)) {
+        if (destDef.isEscortDest === def.questId) {
+          destMesh = loadedNPCs.get(destId);
+          break;
+        }
+      }
+      if (escortMesh && destMesh) {
+        escortMesh.position.set(
+          destMesh.position.x + 1,
+          destMesh.position.y,
+          destMesh.position.z
+        );
+      }
+
       followingNPCs.delete(npcId);
       escortFollowing.delete(npcId);
+      gameState.escortingNPCs = Array.from(followingNPCs);
       await completeQuest(def.questId, questDef, 'dialogueArrived');
     }
   }
@@ -531,4 +607,19 @@ export function getSpawnedItems() {
 
 export function isFollowing(npcId) {
   return followingNPCs.has(npcId);
+}
+
+/**
+ * Restore escort state from saved game data.
+ * Call this after loading save to re-populate the following sets.
+ */
+export function restoreEscortState() {
+  followingNPCs.clear();
+  escortFollowing.clear();
+  if (gameState.escortingNPCs && gameState.escortingNPCs.length > 0) {
+    for (const npcId of gameState.escortingNPCs) {
+      followingNPCs.add(npcId);
+      escortFollowing.add(npcId);
+    }
+  }
 }

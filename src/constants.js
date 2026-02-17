@@ -3,7 +3,7 @@ export const AREAS = {
   house: {
     name: "Lisa's House 🏠",
     ground: 'grass',
-    connections: { right: 'glade' },
+    connections: { right: 'glade', left: 'hospital' },
     isInterior: false,
   },
   houseInside: {
@@ -47,6 +47,11 @@ export const AREAS = {
     ground: 'grass',
     connections: { left: 'creek', top: 'cave' },
   },
+  hospital: {
+    name: 'Animal Hospital 🏥',
+    ground: 'grass',
+    connections: { right: 'house' },
+  },
 };
 
 // Direction opposites (for placing Lisa at correct edge)
@@ -89,6 +94,7 @@ export const QUEST_ORDER = [
   'frog-crown',
   'fox-home',
   'find-mom',
+  'heal-hedgehog',
 ];
 
 // Item emoji map

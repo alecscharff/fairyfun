@@ -10,6 +10,7 @@ import { initInventoryUI } from './inventory.js';
 import { updateNPCs } from './npcs.js';
 import { initParticles, updateParticles } from './particles.js';
 import { getPlayerGroup } from './player.js';
+import { restoreEscortState } from './quests.js';
 
 const clock = new THREE.Clock();
 
@@ -56,6 +57,7 @@ document.getElementById('play-btn').addEventListener('pointerdown', () => {
 
 async function boot() {
   loadSave();
+  restoreEscortState();
   initDayNight();
   await initAreas();
   await initPlayer();

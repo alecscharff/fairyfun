@@ -218,6 +218,39 @@ const AREA_LAYOUTS = {
       { type: 'sphere', color: 0xff69b4, pos: [-1, 0.2, 4], scale: [0.3, 0.3, 0.3] },
     ],
   },
+  hospital: {
+    props: [
+      // Hospital building
+      { type: 'box', color: 0xffffff, pos: [0, 2, -3], scale: [5, 4, 3], name: 'hospital-building' },
+      // Roof
+      { type: 'box', color: 0xff6b6b, pos: [0, 4.2, -3], scale: [5.5, 0.5, 3.5] },
+      // Red cross on front
+      { type: 'box', color: 0xff0000, pos: [0, 2.8, -1.4], scale: [0.8, 0.2, 0.05] },
+      { type: 'box', color: 0xff0000, pos: [0, 2.8, -1.4], scale: [0.2, 0.8, 0.05] },
+      // Door
+      { type: 'box', color: 0x87ceeb, pos: [0, 1, -1.45], scale: [1.2, 2, 0.1] },
+      // Windows
+      { type: 'box', color: 0x87ceeb, pos: [-1.5, 2.5, -1.45], scale: [0.8, 0.8, 0.05] },
+      { type: 'box', color: 0x87ceeb, pos: [1.5, 2.5, -1.45], scale: [0.8, 0.8, 0.05] },
+      // Garden flowers
+      { type: 'sphere', color: 0xff69b4, pos: [-3, 0.25, 1], scale: [0.3, 0.3, 0.3] },
+      { type: 'sphere', color: 0xffd700, pos: [-2.5, 0.25, 1.5], scale: [0.25, 0.25, 0.25] },
+      { type: 'sphere', color: 0xff69b4, pos: [3, 0.25, 1], scale: [0.3, 0.3, 0.3] },
+      { type: 'sphere', color: 0x9370db, pos: [2.5, 0.25, 2], scale: [0.28, 0.28, 0.28] },
+      // Fence
+      { type: 'box', color: 0xffffff, pos: [-4, 0.4, 2], scale: [0.1, 0.8, 0.1] },
+      { type: 'box', color: 0xffffff, pos: [-3, 0.4, 2], scale: [0.1, 0.8, 0.1] },
+      { type: 'box', color: 0xffffff, pos: [-3.5, 0.4, 2], scale: [1.2, 0.1, 0.05] },
+      { type: 'box', color: 0xffffff, pos: [4, 0.4, 2], scale: [0.1, 0.8, 0.1] },
+      { type: 'box', color: 0xffffff, pos: [3, 0.4, 2], scale: [0.1, 0.8, 0.1] },
+      { type: 'box', color: 0xffffff, pos: [3.5, 0.4, 2], scale: [1.2, 0.1, 0.05] },
+      // Trees
+      { type: 'cone', color: 0x2d8a4e, pos: [-6, 2, -2], scale: [1.5, 4, 1.5] },
+      { type: 'cylinder', color: 0x8b5e3c, pos: [-6, 0.5, -2], scale: [0.3, 1, 0.3] },
+      { type: 'cone', color: 0x2d8a4e, pos: [6, 2.5, 0], scale: [1.8, 5, 1.8] },
+      { type: 'cylinder', color: 0x8b5e3c, pos: [6, 0.5, 0], scale: [0.3, 1, 0.3] },
+    ],
+  },
 };
 
 // Create a primitive mesh from a prop definition

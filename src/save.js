@@ -16,6 +16,7 @@ const defaultState = {
   twigCount: 0,
   isNewGame: true,
   collectedItems: [], // Track which items have been picked up (itemKeys)
+  escortingNPCs: [], // NPC IDs currently following the player
 };
 
 export let gameState = structuredClone(defaultState);
