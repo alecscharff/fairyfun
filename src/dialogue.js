@@ -35,26 +35,28 @@ function playAudioFile(text, audioKey) {
   currentAudio = audio;
   isSpeaking = true;
 
-  // Guard against both error event and play().catch() both firing
-  let fallbackTriggered = false;
-
   audio.addEventListener('ended', () => {
     isSpeaking = false;
     currentAudio = null;
   });
 
   audio.addEventListener('error', () => {
-    if (fallbackTriggered) return;
-    fallbackTriggered = true;
-    isSpeaking = false;
-    currentAudio = null;
-    speakFallback(text);
+    // Only trigger fallback if this audio is still the current one
+    if (currentAudio === audio) {
+      isSpeaking = false;
+      currentAudio = null;
+      speakFallback(text);
+    }
   });
 
+  // Start playing - if it fails, let the error handler deal with it
   audio.play().catch(() => {
-    if (fallbackTriggered) return;
-    fallbackTriggered = true;
-    speakFallback(text);
+    // Only trigger fallback if this audio is still the current one
+    if (currentAudio === audio) {
+      isSpeaking = false;
+      currentAudio = null;
+      speakFallback(text);
+    }
   });
 
   return true;
