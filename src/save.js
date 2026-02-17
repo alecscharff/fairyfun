@@ -15,6 +15,7 @@ const defaultState = {
   hasBrushedTeeth: false,
   twigCount: 0,
   isNewGame: true,
+  collectedItems: [], // Track which items have been picked up (itemKeys)
 };
 
 export let gameState = structuredClone(defaultState);

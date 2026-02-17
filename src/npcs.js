@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { scene } from './engine.js';
+import { scene, loadModel } from './engine.js';
 import { gameState } from './save.js';
 
 // Set of npcIds currently following the player (populated by quests.js)
@@ -14,6 +14,7 @@ export const NPC_DEFS = {
     color: 0xffffff,
     bodyColor: 0xf5f5f5,
     questId: 'lost-carrot',
+    modelPath: 'animals/bunny.glb',
   },
   unicorn: {
     name: 'Unicorn 🦄',
@@ -30,6 +31,7 @@ export const NPC_DEFS = {
     color: 0x4169e1,
     bodyColor: 0x6495ed,
     questId: 'build-nest',
+    modelPath: 'animals/bird.glb',
   },
   frog: {
     name: 'Frog 🐸',
@@ -38,6 +40,7 @@ export const NPC_DEFS = {
     color: 0x228b22,
     bodyColor: 0x32cd32,
     questId: 'frog-crown',
+    modelPath: 'animals/frog.glb',
   },
   fox: {
     name: 'Fox Cub 🦊',
@@ -69,10 +72,24 @@ export const NPC_DEFS = {
 let loadedNPCs = new Map();
 
 /**
- * Create a simple placeholder NPC mesh.
+ * Create NPC mesh — loads GLB if modelPath exists, otherwise creates placeholder.
  */
-function createNPCMesh(def) {
-  const group = new THREE.Group();
+async function createNPCMesh(def) {
+  let group;
+
+  if (def.modelPath) {
+    // Load real GLB model
+    const gltf = await loadModel(def.modelPath);
+    group = gltf.scene.clone();
+    group.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+  } else {
+    // Placeholder primitive
+    group = new THREE.Group();
 
   // Body
   const bodyGeo = new THREE.SphereGeometry(0.5, 12, 8);
@@ -199,6 +216,7 @@ function createNPCMesh(def) {
     snout.rotation.x = Math.PI / 2;
     group.add(snout);
   }
+  } // End placeholder creation
 
   // Quest indicator (floating ! above head) -- only if quest is available
   const indicatorGeo = new THREE.SphereGeometry(0.12, 8, 6);
@@ -220,7 +238,7 @@ function createNPCMesh(def) {
  * Load NPCs for the given area into the scene.
  * Returns array of NPC meshes for raycasting.
  */
-export function loadNPCsForArea(areaId) {
+export async function loadNPCsForArea(areaId) {
   // Clear previous
   for (const [, mesh] of loadedNPCs) {
     scene.remove(mesh);
@@ -229,10 +247,15 @@ export function loadNPCsForArea(areaId) {
 
   const npcMeshes = [];
 
+  // Load all NPCs in parallel
+  const npcPromises = [];
   for (const [npcId, def] of Object.entries(NPC_DEFS)) {
     if (def.area !== areaId) continue;
+    npcPromises.push({ npcId, def, meshPromise: createNPCMesh(def) });
+  }
 
-    const mesh = createNPCMesh(def);
+  for (const { npcId, def, meshPromise } of npcPromises) {
+    const mesh = await meshPromise;
     mesh.userData.npcId = npcId;
     mesh.userData.interactive = true;
 
@@ -270,9 +293,9 @@ export function shouldDragonAppear(areaId) {
   return false;
 }
 
-export function spawnDragon(areaId) {
+export async function spawnDragon(areaId) {
   const def = NPC_DEFS.dragon;
-  const mesh = createNPCMesh(def);
+  const mesh = await createNPCMesh(def);
   mesh.userData.npcId = 'dragon';
   mesh.userData.interactive = true;
 

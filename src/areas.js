@@ -331,12 +331,12 @@ export async function buildArea(areaId, entryDir) {
   }
 
   // Load NPCs for this area
-  const npcMeshes = loadNPCsForArea(areaId);
+  const npcMeshes = await loadNPCsForArea(areaId);
   interactiveObjects.push(...npcMeshes);
 
   // Spawn dragon if needed
   if (shouldDragonAppear(areaId)) {
-    const dragonMesh = spawnDragon(areaId);
+    const dragonMesh = await spawnDragon(areaId);
     interactiveObjects.push(dragonMesh);
   }
 

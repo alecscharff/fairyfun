@@ -6,6 +6,7 @@ import { showDialogue, speak } from './dialogue.js';
 import { checkForEvening, doEvening } from './daynight.js';
 import { NPC_DEFS, escortFollowing } from './npcs.js';
 import { openPuzzle } from './puzzles.js';
+import { updateInventoryUI } from './inventory.js';
 
 // Quest definitions
 export const QUEST_DEFS = {
@@ -390,15 +391,17 @@ export function spawnQuestItems(areaId) {
     for (const loc of questDef.itemLocations) {
       if (loc.area !== areaId) continue;
 
-      // Don't spawn if already collected (for multi-fetch, track individually)
-      // Simple check: just spawn all items for active quests
+      // Don't spawn if already collected
+      const itemKey = `${questId}-${loc.item}-${loc.pos.join(',')}`;
+      if (gameState.collectedItems.includes(itemKey)) continue;
+
       const mesh = createQuestItemMesh(loc.item);
       mesh.position.set(...loc.pos);
       mesh.userData.questItem = loc.item;
       mesh.userData.questId = questId;
       mesh.userData.interactive = true;
       scene.add(mesh);
-      spawnedItems.set(`${questId}-${loc.item}-${loc.pos.join(',')}`, mesh);
+      spawnedItems.set(itemKey, mesh);
     }
   }
 
@@ -411,36 +414,37 @@ function createQuestItemMesh(itemType) {
 
   switch (itemType) {
     case 'carrot':
-      geo = new THREE.ConeGeometry(0.2, 0.7, 6);
-      mat = new THREE.MeshLambertMaterial({ color: 0xff6600, emissive: 0xff4400, emissiveIntensity: 0.4 });
+      geo = new THREE.ConeGeometry(0.25, 0.9, 6);
+      mat = new THREE.MeshLambertMaterial({ color: 0xff6600, emissive: 0xff4400, emissiveIntensity: 0.5 });
       break;
     case 'gem':
-      geo = new THREE.OctahedronGeometry(0.32);
-      mat = new THREE.MeshLambertMaterial({ color: 0x00bfff, emissive: 0x00bfff, emissiveIntensity: 0.6 });
+      geo = new THREE.OctahedronGeometry(0.4);
+      mat = new THREE.MeshLambertMaterial({ color: 0x00bfff, emissive: 0x00bfff, emissiveIntensity: 0.7 });
       break;
     case 'twig':
-      geo = new THREE.CylinderGeometry(0.06, 0.06, 0.7, 6);
-      mat = new THREE.MeshLambertMaterial({ color: 0x8b4513, emissive: 0x8b4513, emissiveIntensity: 0.2 });
+      geo = new THREE.CylinderGeometry(0.08, 0.08, 0.9, 6);
+      mat = new THREE.MeshLambertMaterial({ color: 0x8b4513, emissive: 0x8b4513, emissiveIntensity: 0.3 });
       break;
     case 'crown':
-      geo = new THREE.TorusGeometry(0.25, 0.07, 6, 12);
-      mat = new THREE.MeshLambertMaterial({ color: 0xffd700, emissive: 0xffd700, emissiveIntensity: 0.6 });
+      geo = new THREE.TorusGeometry(0.3, 0.09, 6, 12);
+      mat = new THREE.MeshLambertMaterial({ color: 0xffd700, emissive: 0xffd700, emissiveIntensity: 0.7 });
       break;
     default:
-      geo = new THREE.SphereGeometry(0.25);
-      mat = new THREE.MeshLambertMaterial({ color: 0xff69b4, emissive: 0xff69b4, emissiveIntensity: 0.4 });
+      geo = new THREE.SphereGeometry(0.3);
+      mat = new THREE.MeshLambertMaterial({ color: 0xff69b4, emissive: 0xff69b4, emissiveIntensity: 0.5 });
   }
 
   const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.y = 0.3; // Raise items off ground for better visibility
   group.add(mesh);
   group.name = 'quest-item';
 
-  // Add a glow ring
-  const ringGeo = new THREE.RingGeometry(0.25, 0.35, 16);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0xffd700, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+  // Add a bigger, brighter glow ring on ground plane
+  const ringGeo = new THREE.RingGeometry(0.4, 0.6, 24);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.6, side: THREE.DoubleSide });
   const ring = new THREE.Mesh(ringGeo, ringMat);
   ring.rotation.x = -Math.PI / 2;
-  ring.position.y = -0.1;
+  ring.position.y = 0.01;
   group.add(ring);
 
   return group;
@@ -472,6 +476,7 @@ function playerHasItem(itemId) {
 function removeFromInventory(itemId) {
   const idx = gameState.inventory.indexOf(itemId);
   if (idx >= 0) gameState.inventory[idx] = null;
+  updateInventoryUI();
   saveGame();
 }
 
@@ -489,6 +494,11 @@ export function pickUpItem(itemKey) {
   if (emptySlot < 0) return false; // inventory full
 
   gameState.inventory[emptySlot] = itemId;
+
+  // Mark as collected permanently
+  if (!gameState.collectedItems.includes(itemKey)) {
+    gameState.collectedItems.push(itemKey);
+  }
 
   // Remove and dispose (mesh is actually a Group)
   mesh.traverse((child) => {
