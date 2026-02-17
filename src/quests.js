@@ -17,17 +17,16 @@ export const QUEST_DEFS = {
     mailLetter: "Dear Lisa, 💌\nI lost my carrot! 🥕\nCan you help me find it?\n- Bunny 🐰",
     mailAudioKey: 'mail-bunny',
     dialogueNotStarted: [
-      { text: "Oh no! I lost my carrot! 🥕", speaker: "Bunny 🐰" },
-      { text: "Can you help me find it?", speaker: "Bunny 🐰" },
-      { text: "I think it is by the big rocks. 🪨", speaker: "Bunny 🐰" },
+      { text: "Oh no! I lost my carrot! 🥕", speaker: "Bunny 🐰", audioKey: 'bunny-01' },
+      { text: "Can you help me find it?", speaker: "Bunny 🐰", audioKey: 'bunny-02' },
+      { text: "I think it is by the big rocks. 🪨", speaker: "Bunny 🐰", audioKey: 'bunny-03' },
     ],
     dialogueHasItem: [
-      { text: "You got my carrot! 🥕🎉", speaker: "Bunny 🐰" },
-      { text: "Thank you so much!", speaker: "Bunny 🐰" },
-      { text: "Go home and check the mail! 📬", speaker: "Bunny 🐰" },
+      { text: "You got my carrot! Thank you so much! 🥕🎉", speaker: "Bunny 🐰", audioKey: 'bunny-got-01' },
+      { text: "Go home and check the mail! 📬", speaker: "Bunny 🐰", audioKey: 'bunny-got-02' },
     ],
     dialogueDone: [
-      { text: "I love my carrot! 🥕💚", speaker: "Bunny 🐰" },
+      { text: "I love my carrot! 🥕💚", speaker: "Bunny 🐰", audioKey: 'bunny-done' },
     ],
   },
   'horn-gem': {
@@ -39,17 +38,16 @@ export const QUEST_DEFS = {
     mailLetter: "Dear Lisa, 💌\nMy horn gem is gone! 💎\nIt is in the dark cave.\nCan you help me?\n- Unicorn 🦄",
     mailAudioKey: 'mail-unicorn',
     dialogueNotStarted: [
-      { text: "My horn gem is gone! 💎", speaker: "Unicorn 🦄" },
-      { text: "It is in the cave. But it is so dark!", speaker: "Unicorn 🦄" },
-      { text: "Can you find it for me?", speaker: "Unicorn 🦄" },
+      { text: "My horn gem is gone! 💎", speaker: "Unicorn 🦄", audioKey: 'unicorn-01' },
+      { text: "It is in the cave. But it is so dark!", speaker: "Unicorn 🦄", audioKey: 'unicorn-02' },
+      { text: "Can you find it for me?", speaker: "Unicorn 🦄", audioKey: 'unicorn-03' },
     ],
     dialogueHasItem: [
-      { text: "My gem! You got it! 💎✨", speaker: "Unicorn 🦄" },
-      { text: "Thank you, Lisa!", speaker: "Unicorn 🦄" },
-      { text: "Go home and check the mail! 📬", speaker: "Unicorn 🦄" },
+      { text: "My gem! You got it! 💎✨", speaker: "Unicorn 🦄", audioKey: 'unicorn-got-01' },
+      { text: "Thank you, Lisa! Go home and check the mail! 📬", speaker: "Unicorn 🦄", audioKey: 'unicorn-got-02' },
     ],
     dialogueDone: [
-      { text: "My horn shines so nice now! ✨", speaker: "Unicorn 🦄" },
+      { text: "My horn shines so nice now! ✨", speaker: "Unicorn 🦄", audioKey: 'unicorn-done' },
     ],
   },
   'build-nest': {
@@ -66,20 +64,19 @@ export const QUEST_DEFS = {
     mailLetter: "Dear Lisa, 💌\nI need to make a nest! 🪹\nCan you find me 3 twigs? 🌿\n- Bird 🐦",
     mailAudioKey: 'mail-bird',
     dialogueNotStarted: [
-      { text: "I need to make a nest! 🪹", speaker: "Bird 🐦" },
-      { text: "Can you find me 3 twigs? 🌿", speaker: "Bird 🐦" },
-      { text: "Look in the forest!", speaker: "Bird 🐦" },
+      { text: "I need to make a nest! 🪹", speaker: "Bird 🐦", audioKey: 'bird-01' },
+      { text: "Can you find me 3 twigs? 🌿", speaker: "Bird 🐦", audioKey: 'bird-02' },
+      { text: "Look in the forest!", speaker: "Bird 🐦", audioKey: 'bird-03' },
     ],
     dialogueHasItem: [
-      { text: "A twig! Thank you! 🌿", speaker: "Bird 🐦" },
+      { text: "A twig! Thank you! 🌿", speaker: "Bird 🐦", audioKey: 'bird-got-twig' },
     ],
     dialogueAllItems: [
-      { text: "You got all the twigs! 🪹🎉", speaker: "Bird 🐦" },
-      { text: "Now I can make my nest!", speaker: "Bird 🐦" },
-      { text: "Go home and check the mail! 📬", speaker: "Bird 🐦" },
+      { text: "You got all the twigs! Now I can make my nest! 🪹🎉", speaker: "Bird 🐦", audioKey: 'bird-all-01' },
+      { text: "Go home and check the mail! 📬", speaker: "Bird 🐦", audioKey: 'bird-all-02' },
     ],
     dialogueDone: [
-      { text: "I love my nest! 🪹💚", speaker: "Bird 🐦" },
+      { text: "I love my nest! 🪹💚", speaker: "Bird 🐦", audioKey: 'bird-done' },
     ],
   },
   'frog-crown': {
@@ -91,17 +88,15 @@ export const QUEST_DEFS = {
     mailLetter: "Dear Lisa, 💌\nI lost my crown! 👑\nIt is in the cave.\nCan you find it?\n- Frog 🐸",
     mailAudioKey: 'mail-frog',
     dialogueNotStarted: [
-      { text: "I am a frog prince! 🐸", speaker: "Frog 🐸" },
-      { text: "But I lost my crown! 👑", speaker: "Frog 🐸" },
-      { text: "I think it is in the cave.", speaker: "Frog 🐸" },
+      { text: "I am a frog prince! But I lost my crown! 🐸👑", speaker: "Frog 🐸", audioKey: 'frog-01' },
+      { text: "I think it is in the cave.", speaker: "Frog 🐸", audioKey: 'frog-02' },
     ],
     dialogueHasItem: [
-      { text: "My crown! You got it! 👑🎉", speaker: "Frog 🐸" },
-      { text: "Thank you, Lisa!", speaker: "Frog 🐸" },
-      { text: "Go home and check the mail! 📬", speaker: "Frog 🐸" },
+      { text: "My crown! You got it! 👑🎉", speaker: "Frog 🐸", audioKey: 'frog-got-01' },
+      { text: "Thank you, Lisa! Go home and check the mail! 📬", speaker: "Frog 🐸", audioKey: 'frog-got-02' },
     ],
     dialogueDone: [
-      { text: "I feel like a prince! 👑✨", speaker: "Frog 🐸" },
+      { text: "I feel like a prince! 👑✨", speaker: "Frog 🐸", audioKey: 'frog-done' },
     ],
   },
   'fox-home': {
@@ -112,20 +107,19 @@ export const QUEST_DEFS = {
     mailLetter: "Dear Lisa, 💌\nI am lost! 😢\nCan you take me home?\nI live by the big glade.\n- Fox Cub 🦊",
     mailAudioKey: 'mail-fox',
     dialogueNotStarted: [
-      { text: "I am lost! 😢", speaker: "Fox Cub 🦊" },
-      { text: "Can you help me get home?", speaker: "Fox Cub 🦊" },
-      { text: "I live by the big glade.", speaker: "Fox Cub 🦊" },
+      { text: "I am lost! 😢", speaker: "Fox Cub 🦊", audioKey: 'fox-01' },
+      { text: "Can you help me get home?", speaker: "Fox Cub 🦊", audioKey: 'fox-02' },
+      { text: "I live by the big glade.", speaker: "Fox Cub 🦊", audioKey: 'fox-03' },
     ],
     dialogueFollowing: [
-      { text: "I will go with you! Let's go! 🦊", speaker: "Fox Cub 🦊" },
+      { text: "I will go with you! Let's go! 🦊", speaker: "Fox Cub 🦊", audioKey: 'fox-follow' },
     ],
     dialogueArrived: [
-      { text: "This is it! I am home! 🎉", speaker: "Fox Cub 🦊" },
-      { text: "Thank you so much, Lisa!", speaker: "Fox Cub 🦊" },
-      { text: "Go home and check the mail! 📬", speaker: "Fox Cub 🦊" },
+      { text: "This is it! I am home! 🎉", speaker: "Fox Cub 🦊", audioKey: 'fox-arrived-01' },
+      { text: "Thank you so much, Lisa! Go home and check the mail! 📬", speaker: "Fox Cub 🦊", audioKey: 'fox-arrived-02' },
     ],
     dialogueDone: [
-      { text: "I love it here! 💚", speaker: "Fox Cub 🦊" },
+      { text: "I love it here! 💚", speaker: "Fox Cub 🦊", audioKey: 'fox-done' },
     ],
   },
   'find-mom': {
@@ -136,20 +130,19 @@ export const QUEST_DEFS = {
     mailLetter: "Dear Lisa, 💌\nI can not find my mom! 😢\nShe is in the glen.\nCan you take me to her?\n- Baby Deer 🦌",
     mailAudioKey: 'mail-deer',
     dialogueNotStarted: [
-      { text: "I can not find my mom! 😢", speaker: "Baby Deer 🦌" },
-      { text: "She is in the glen.", speaker: "Baby Deer 🦌" },
-      { text: "Can you take me to her?", speaker: "Baby Deer 🦌" },
+      { text: "I can not find my mom! 😢", speaker: "Baby Deer 🦌", audioKey: 'deer-01' },
+      { text: "She is in the glen.", speaker: "Baby Deer 🦌", audioKey: 'deer-02' },
+      { text: "Can you take me to her?", speaker: "Baby Deer 🦌", audioKey: 'deer-03' },
     ],
     dialogueFollowing: [
-      { text: "Let's go find my mom! 🦌", speaker: "Baby Deer 🦌" },
+      { text: "Let's go find my mom! 🦌", speaker: "Baby Deer 🦌", audioKey: 'deer-follow' },
     ],
     dialogueArrived: [
-      { text: "Mom! I found you! 🎉", speaker: "Baby Deer 🦌" },
-      { text: "Thank you, Lisa!", speaker: "Baby Deer 🦌" },
-      { text: "Go home and check the mail! 📬", speaker: "Baby Deer 🦌" },
+      { text: "Mom! I found you! 🎉", speaker: "Baby Deer 🦌", audioKey: 'deer-arrived-01' },
+      { text: "Thank you, Lisa! Go home and check the mail! 📬", speaker: "Baby Deer 🦌", audioKey: 'deer-arrived-02' },
     ],
     dialogueDone: [
-      { text: "I am with my mom now! 💚", speaker: "Baby Deer 🦌" },
+      { text: "I am with my mom now! 💚", speaker: "Baby Deer 🦌", audioKey: 'deer-done' },
     ],
   },
 };

@@ -33,14 +33,14 @@ async function handleBed() {
   if (ds === DAY_STATES.EVENING || ds === DAY_STATES.NIGHT) {
     if (!gameState.hasBrushedTeeth) {
       await showDialogue([
-        { text: "I need to brush my teeth first! 🪥", speaker: "Lisa 🧚" },
+        { text: "I need to brush my teeth first! 🪥", speaker: "Lisa 🧚", audioKey: 'house-brush-first' },
       ]);
       return true;
     }
 
     await showDialogue([
-      { text: "Time to sleep! Good night! 🌙", speaker: "Lisa 🧚" },
-      { text: "💤 zzz...", speaker: "" },
+      { text: "Time to sleep! Good night! 🌙", speaker: "Lisa 🧚", audioKey: 'house-goodnight' },
+      { text: "Zzz... 💤", speaker: "", audioKey: 'house-zzz' },
     ]);
 
     await doNight();
@@ -56,15 +56,14 @@ async function handleStove() {
 
   if (activeQuest) {
     await showDialogue([
-      { text: "Time to cook! 🍳", speaker: "Lisa 🧚" },
-      { text: "Yum! It is done! 🎉", speaker: "Lisa 🧚" },
+      { text: "Time to cook! Yum! It is done! 🎉", speaker: "Lisa 🧚", audioKey: 'house-cook-done' },
     ]);
     // Cooking logic will be connected in quests.js Phase 4
     return true;
   }
 
   await showDialogue([
-    { text: "My stove! I can cook here. 🍳", speaker: "Lisa 🧚" },
+    { text: "My stove! I can cook here. 🍳", speaker: "Lisa 🧚", audioKey: 'house-stove-idle' },
   ]);
   return true;
 }
@@ -72,14 +71,13 @@ async function handleStove() {
 async function handleToothbrush() {
   if (gameState.hasBrushedTeeth) {
     await showDialogue([
-      { text: "My teeth are all clean! ✨", speaker: "Lisa 🧚" },
+      { text: "My teeth are all clean! ✨", speaker: "Lisa 🧚", audioKey: 'house-brush-done' },
     ]);
     return true;
   }
 
   await showDialogue([
-    { text: "Brush, brush, brush! 🪥", speaker: "Lisa 🧚" },
-    { text: "So clean! ✨", speaker: "Lisa 🧚" },
+    { text: "Brush, brush, brush! So clean! ✨", speaker: "Lisa 🧚", audioKey: 'house-brush-do' },
   ]);
 
   gameState.hasBrushedTeeth = true;

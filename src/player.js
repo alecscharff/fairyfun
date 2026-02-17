@@ -10,6 +10,8 @@ import { updateInventoryUI } from './inventory.js';
 // Player model (placeholder: a simple fairy-like figure)
 let playerGroup = null;
 let targetPosition = null;
+let pendingInteraction = null; // callback to fire when Lisa arrives close enough
+const INTERACT_DIST = 1.4;    // how close Lisa needs to be to trigger an interaction
 const moveSpeed = 5;
 let isMoving = false;
 
@@ -107,9 +109,15 @@ export function updatePlayer(dt) {
   const dz = targetPosition.z - playerGroup.position.z;
   const dist = Math.sqrt(dx * dx + dz * dz);
 
-  if (dist < 0.15) {
+  const arrivalDist = pendingInteraction ? INTERACT_DIST : 0.15;
+  if (dist < arrivalDist) {
     isMoving = false;
     targetPosition = null;
+    if (pendingInteraction) {
+      const cb = pendingInteraction;
+      pendingInteraction = null;
+      cb();
+    }
     return;
   }
 
@@ -153,39 +161,52 @@ function onPointerDown(e) {
         hitRoot = hitRoot.parent;
       }
 
-      // NPC interaction
+      // NPC interaction — walk to NPC first
       if (hitRoot.userData.npcId) {
-        handleNPCInteraction(hitRoot.userData.npcId);
+        const npcPos = new THREE.Vector3();
+        hitRoot.getWorldPosition(npcPos);
+        targetPosition = new THREE.Vector3(npcPos.x, 0, npcPos.z);
+        const npcId = hitRoot.userData.npcId;
+        pendingInteraction = () => handleNPCInteraction(npcId);
         return;
       }
 
-      // Quest item pickup
+      // Quest item pickup — walk to item first
       if (hitRoot.userData.questItem) {
-        const items = getSpawnedItems();
-        for (const [key, mesh] of items) {
-          if (mesh === hitRoot) {
-            const success = pickUpItem(key);
-            if (success) {
-              const itemId = hitRoot.userData.questItem;
-              const emoji = ITEM_EMOJI[itemId] || '✨';
-              showDialogue([{ text: `Got it! ${emoji}`, speaker: 'Lisa 🧚' }]);
-              // Update inventory UI
-              updateInventoryUI();
+        const itemPos = new THREE.Vector3();
+        hitRoot.getWorldPosition(itemPos);
+        targetPosition = new THREE.Vector3(itemPos.x, 0, itemPos.z);
+        const capturedHitRoot = hitRoot;
+        pendingInteraction = () => {
+          const items = getSpawnedItems();
+          for (const [key, mesh] of items) {
+            if (mesh === capturedHitRoot) {
+              const success = pickUpItem(key);
+              if (success) {
+                const itemId = capturedHitRoot.userData.questItem;
+                const emoji = ITEM_EMOJI[itemId] || '✨';
+                showDialogue([{ text: `Got it! ${emoji}`, speaker: 'Lisa 🧚' }]);
+                updateInventoryUI();
+              }
+              return;
             }
-            return;
           }
-        }
+        };
         return;
       }
 
-      // Area object interaction (house items, mailbox, doors)
+      // Area object interaction (house items, mailbox, doors) — walk first
       let namedObj = interactHits[0].object;
       while (namedObj && !namedObj.name && namedObj.parent) {
         namedObj = namedObj.parent;
       }
       if (namedObj.name) {
-        const handled = handleAreaInteraction(namedObj.name);
-        if (handled) return;
+        const objPos = new THREE.Vector3();
+        namedObj.getWorldPosition(objPos);
+        targetPosition = new THREE.Vector3(objPos.x, 0, objPos.z);
+        const capturedName = namedObj.name;
+        pendingInteraction = () => handleAreaInteraction(capturedName);
+        return;
       }
     }
   }
