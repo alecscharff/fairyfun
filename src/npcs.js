@@ -250,7 +250,8 @@ export async function loadNPCsForArea(areaId) {
   // Load all NPCs in parallel
   const npcPromises = [];
   for (const [npcId, def] of Object.entries(NPC_DEFS)) {
-    if (def.area !== areaId) continue;
+    // Load NPCs that belong to this area OR are currently escorting
+    if (def.area !== areaId && !escortFollowing.has(npcId)) continue;
     npcPromises.push({ npcId, def, meshPromise: createNPCMesh(def) });
   }
 
@@ -258,6 +259,13 @@ export async function loadNPCsForArea(areaId) {
     const mesh = await meshPromise;
     mesh.userData.npcId = npcId;
     mesh.userData.interactive = true;
+
+    // If escorting and not in home area, spawn near entry point (will be adjusted by updateNPCs)
+    if (escortFollowing.has(npcId) && def.area !== areaId) {
+      // Position will be updated by updateNPCs to follow player
+      // For now, just use a neutral spawn position
+      mesh.position.set(0, 0, 2);
+    }
 
     // Show quest indicator if quest is not started or active
     if (def.questId) {
