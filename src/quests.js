@@ -489,6 +489,17 @@ export function pickUpItem(itemKey) {
   if (emptySlot < 0) return false; // inventory full
 
   gameState.inventory[emptySlot] = itemId;
+
+  // Remove and dispose (mesh is actually a Group)
+  mesh.traverse((child) => {
+    if (child.isMesh) {
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) {
+        if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+        else child.material.dispose();
+      }
+    }
+  });
   scene.remove(mesh);
   spawnedItems.delete(itemKey);
   saveGame();
