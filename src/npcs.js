@@ -43,7 +43,7 @@ export const NPC_DEFS = {
     bodyColor: 0x32cd32,
     questId: 'frog-crown',
     modelPath: 'animals/frog.glb',
-    modelScale: 0.3,
+    modelScale: 0.15,
   },
   fox: {
     name: 'Fox Cub 🦊',

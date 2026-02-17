@@ -270,6 +270,14 @@ async function handleActiveQuestNPC(npcId, questId, questDef) {
   if (questDef.puzzleGate && !gameState.puzzlesSolved.includes(questDef.puzzleGate)) {
     await showDialogue([{ text: "Wait! Let's solve this first! 🧩", speaker: "Lisa 🧚" }]);
     await openPuzzle(questDef.puzzleGate);
+
+    // Check again if puzzle was solved - if not, don't continue
+    if (!gameState.puzzlesSolved.includes(questDef.puzzleGate)) {
+      return; // Puzzle wasn't solved, stop here
+    }
+
+    // Puzzle was solved! Continue automatically with the quest
+    await showDialogue([{ text: "Great! Now let's help! 💜", speaker: "Lisa 🧚" }]);
   }
 
   if (questDef.type === 'fetch') {
