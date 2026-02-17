@@ -1,0 +1,51 @@
+How to add real 3D models
+1. Get the files
+The plan calls for free CC0 models. Download these:
+
+Quaternius Ultimate Animated Animals — bunny, fox, deer, bird, frog (CC0)
+Kenney Nature Kit — trees, rocks, mushrooms, bushes (CC0)
+Poly Pizza — search "dragon", "unicorn", "cottage" (CC-BY, free)
+All come as .glb or .gltf. If you get .gltf + textures, convert to a single .glb using gltf.report (drag & drop → Export GLB).
+
+2. Put them in the right folders
+
+public/models/
+  animals/    bunny.glb  fox.glb  deer.glb  bird.glb  frog.glb
+  characters/ lisa.glb
+  props/      carrot.glb  crown.glb  gem.glb  twig.glb
+  environment/ tree.glb  rock.glb  mushroom.glb  bush.glb  flower.glb
+  house/      cottage.glb
+3. Use them in code
+The loadModel function in src/engine.js is already wired up — it takes a path relative to public/models/:
+
+
+const gltf = await loadModel('animals/bunny.glb');
+const mesh = gltf.scene.clone();
+mesh.position.set(2, 0, 1);
+scene.add(mesh);
+For animated models, hook up the mixer:
+
+
+import { mixers } from './engine.js';
+
+const gltf = await loadModel('animals/bunny.glb');
+const mesh = gltf.scene.clone();
+const mixer = new THREE.AnimationMixer(mesh);
+const idleClip = THREE.AnimationClip.findByName(gltf.animations, 'Idle');
+if (idleClip) mixer.clipAction(idleClip).play();
+mixers.add(mixer);
+scene.add(mesh);
+4. Where to swap out placeholders
+The placeholder geometry lives in two places:
+
+NPCs → src/npcs.js — createNPCMesh(def) function. Replace with await loadModel(...) and the def object already has an area and pos for placement.
+Environment props (trees, rocks, house) → src/areas.js — each area's layout array has entries like { type: 'tree', pos: [...] } where the geometry is built inline. Swap those for loadModel calls.
+Lisa herself → src/player.js — createPlaceholderFairy() at line 17.
+Quick priority order
+If you want to do one at a time, I'd suggest:
+
+Lisa (she's on screen constantly — biggest visual impact)
+NPCs (bunny, etc.)
+House/cottage exterior
+Environment props (trees last since they're decorative)
+Want me to wire up a specific model once you have the file?

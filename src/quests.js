@@ -4,7 +4,8 @@ import { gameState, saveGame } from './save.js';
 import { QUEST_ORDER, ITEM_EMOJI } from './constants.js';
 import { showDialogue, speak } from './dialogue.js';
 import { checkForEvening, doEvening } from './daynight.js';
-import { NPC_DEFS } from './npcs.js';
+import { NPC_DEFS, escortFollowing } from './npcs.js';
+import { openPuzzle } from './puzzles.js';
 
 // Quest definitions
 export const QUEST_DEFS = {
@@ -264,6 +265,12 @@ export async function handleNPCInteraction(npcId) {
 }
 
 async function handleActiveQuestNPC(npcId, questId, questDef) {
+  // Check puzzle gate — must solve puzzle first
+  if (questDef.puzzleGate && !gameState.puzzlesSolved.includes(questDef.puzzleGate)) {
+    await showDialogue([{ text: "Wait! Let's solve this first! 🧩", speaker: "Lisa 🧚" }]);
+    await openPuzzle(questDef.puzzleGate);
+  }
+
   if (questDef.type === 'fetch') {
     // Check if player has the item
     if (playerHasItem(questDef.giveItem)) {
@@ -299,6 +306,7 @@ async function handleActiveQuestNPC(npcId, questId, questDef) {
   } else if (questDef.type === 'escort') {
     if (!followingNPCs.has(npcId)) {
       followingNPCs.add(npcId);
+      escortFollowing.add(npcId);
       await showDialogue(questDef.dialogueFollowing);
     } else {
       await showDialogue([
@@ -403,24 +411,24 @@ function createQuestItemMesh(itemType) {
 
   switch (itemType) {
     case 'carrot':
-      geo = new THREE.ConeGeometry(0.12, 0.5, 6);
-      mat = new THREE.MeshLambertMaterial({ color: 0xff6600, emissive: 0xff6600, emissiveIntensity: 0.2 });
+      geo = new THREE.ConeGeometry(0.2, 0.7, 6);
+      mat = new THREE.MeshLambertMaterial({ color: 0xff6600, emissive: 0xff4400, emissiveIntensity: 0.4 });
       break;
     case 'gem':
-      geo = new THREE.OctahedronGeometry(0.2);
-      mat = new THREE.MeshLambertMaterial({ color: 0x00bfff, emissive: 0x00bfff, emissiveIntensity: 0.4 });
+      geo = new THREE.OctahedronGeometry(0.32);
+      mat = new THREE.MeshLambertMaterial({ color: 0x00bfff, emissive: 0x00bfff, emissiveIntensity: 0.6 });
       break;
     case 'twig':
-      geo = new THREE.CylinderGeometry(0.03, 0.03, 0.5, 4);
-      mat = new THREE.MeshLambertMaterial({ color: 0x8b4513, emissive: 0x8b4513, emissiveIntensity: 0.1 });
+      geo = new THREE.CylinderGeometry(0.06, 0.06, 0.7, 6);
+      mat = new THREE.MeshLambertMaterial({ color: 0x8b4513, emissive: 0x8b4513, emissiveIntensity: 0.2 });
       break;
     case 'crown':
-      geo = new THREE.TorusGeometry(0.15, 0.04, 6, 12);
-      mat = new THREE.MeshLambertMaterial({ color: 0xffd700, emissive: 0xffd700, emissiveIntensity: 0.4 });
+      geo = new THREE.TorusGeometry(0.25, 0.07, 6, 12);
+      mat = new THREE.MeshLambertMaterial({ color: 0xffd700, emissive: 0xffd700, emissiveIntensity: 0.6 });
       break;
     default:
-      geo = new THREE.SphereGeometry(0.15);
-      mat = new THREE.MeshLambertMaterial({ color: 0xff69b4, emissive: 0xff69b4, emissiveIntensity: 0.3 });
+      geo = new THREE.SphereGeometry(0.25);
+      mat = new THREE.MeshLambertMaterial({ color: 0xff69b4, emissive: 0xff69b4, emissiveIntensity: 0.4 });
   }
 
   const mesh = new THREE.Mesh(geo, mat);
@@ -450,6 +458,7 @@ export async function checkEscortArrival(areaId) {
 
     if (areaId === questDef.destination) {
       followingNPCs.delete(npcId);
+      escortFollowing.delete(npcId);
       await completeQuest(def.questId, questDef, 'dialogueArrived');
     }
   }

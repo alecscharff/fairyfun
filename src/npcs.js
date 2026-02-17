@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { scene } from './engine.js';
 import { gameState } from './save.js';
 
+// Set of npcIds currently following the player (populated by quests.js)
+export const escortFollowing = new Set();
+
 // NPC definitions
 export const NPC_DEFS = {
   bunny: {
@@ -288,14 +291,31 @@ export function spawnDragon(areaId) {
 }
 
 /**
- * Update NPC animations (simple idle bob).
+ * Update NPC animations and escort following.
+ * @param {number} dt
+ * @param {THREE.Vector3} playerPos
  */
-export function updateNPCs(dt) {
+export function updateNPCs(dt, playerPos) {
   const t = Date.now() * 0.002;
   for (const [npcId, mesh] of loadedNPCs) {
+    // Escort: follow the player at a short distance
+    if (escortFollowing.has(npcId) && playerPos) {
+      const dx = playerPos.x - mesh.position.x;
+      const dz = playerPos.z - mesh.position.z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      const FOLLOW_GAP = 1.2; // stay this far behind Lisa
+      if (dist > FOLLOW_GAP + 0.1) {
+        const speed = 4 * dt;
+        const ratio = (dist - FOLLOW_GAP) / dist;
+        mesh.position.x += dx * ratio * Math.min(speed / dist * dist, 1);
+        mesh.position.z += dz * ratio * Math.min(speed / dist * dist, 1);
+        mesh.rotation.y = Math.atan2(dx, dz);
+      }
+    }
+
     // Gentle bob
-    const baseY = mesh.userData.baseY || mesh.position.y;
-    if (!mesh.userData.baseY) mesh.userData.baseY = baseY;
+    const baseY = mesh.userData.baseY ?? mesh.position.y;
+    if (mesh.userData.baseY === undefined) mesh.userData.baseY = baseY;
     mesh.position.y = baseY + Math.sin(t + npcId.length) * 0.05;
 
     // Quest indicator pulse

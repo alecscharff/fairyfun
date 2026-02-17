@@ -1,49 +1,49 @@
 // Area connection graph
 export const AREAS = {
   house: {
-    name: "Lisa's House",
+    name: "Lisa's House 🏠",
     ground: 'grass',
     connections: { right: 'glade' },
     isInterior: false,
   },
   houseInside: {
-    name: "Lisa's House",
+    name: "Lisa's House 🏠",
     ground: 'wood',
     connections: {},
     isInterior: true,
   },
   glade: {
-    name: 'Fairy Glade',
+    name: 'Fairy Glade 🌸',
     ground: 'grass',
     connections: { left: 'house', right: 'meadow', bottom: 'creek' },
   },
   meadow: {
-    name: 'Mushroom Meadow',
+    name: 'Mushroom Meadow 🍄',
     ground: 'grass',
     connections: { left: 'glade', right: 'hollow', top: 'glen' },
   },
   glen: {
-    name: 'Unicorn Glen',
+    name: 'Unicorn Glen 🦄',
     ground: 'grass',
     connections: { bottom: 'meadow' },
   },
   hollow: {
-    name: 'Old Oak Hollow',
+    name: 'Old Oak Hollow 🌳',
     ground: 'dirt',
     connections: { left: 'meadow', right: 'cave' },
   },
   cave: {
-    name: 'Sparkle Cave',
+    name: 'Sparkle Cave ✨',
     ground: 'dirt',
     connections: { left: 'hollow', bottom: 'bushes' },
   },
   creek: {
-    name: 'Crystal Creek',
+    name: 'Crystal Creek 💧',
     ground: 'grass',
     connections: { top: 'glade', right: 'bushes' },
   },
   bushes: {
-    name: 'Berry Bush Meadow',
+    name: 'Berry Bush Meadow 🫐',
     ground: 'grass',
     connections: { left: 'creek', top: 'cave' },
   },

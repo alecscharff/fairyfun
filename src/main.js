@@ -3,8 +3,8 @@ import { scene, camera, renderer, updateMixers } from './engine.js';
 import { INTRO_LINES } from './constants.js';
 import { loadSave, gameState } from './save.js';
 import { showDialogue, speak } from './dialogue.js';
-import { initAreas, buildArea } from './areas.js';
-import { initPlayer, updatePlayer } from './player.js';
+import { initAreas, buildArea, checkEdgeNavigation } from './areas.js';
+import { initPlayer, updatePlayer, getPlayerPosition } from './player.js';
 import { initDayNight } from './daynight.js';
 import { initInventoryUI } from './inventory.js';
 import { updateNPCs } from './npcs.js';
@@ -78,9 +78,9 @@ async function startGame() {
   // If new game, show morning wake-up dialogue
   if (gameState.isNewGame) {
     await showDialogue([
-      { text: "Good morning! ☀️", speaker: "Lisa 🧚" },
-      { text: "Time to brush my teeth! 🪥", speaker: "Lisa 🧚" },
-      { text: "Then I can check the mail! 📬", speaker: "Lisa 🧚" },
+      { text: "Good morning! ☀️", speaker: "Lisa 🧚", audioKey: 'morning-01' },
+      { text: "Time to brush my teeth! 🪥", speaker: "Lisa 🧚", audioKey: 'morning-02' },
+      { text: "Then I can check the mail! 📬", speaker: "Lisa 🧚", audioKey: 'morning-03' },
     ]);
     gameState.isNewGame = false;
   }
@@ -89,7 +89,8 @@ async function startGame() {
 function gameLoop() {
   const dt = clock.getDelta();
   updatePlayer(dt);
-  updateNPCs(dt);
+  checkEdgeNavigation(getPlayerPosition());
+  updateNPCs(dt, getPlayerPosition());
   updateParticles(dt);
   updateMixers(dt);
   renderer.render(scene, camera);

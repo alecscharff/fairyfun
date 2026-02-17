@@ -463,3 +463,26 @@ export function getCurrentAreaId() {
 export function getGroundMesh() {
   return groundMesh;
 }
+
+// Walk-to-edge area transitions. Called from main.js game loop with current player position.
+let edgeTransitionLocked = false;
+const EDGE_THRESHOLD = 8.5;
+
+export function checkEdgeNavigation(playerPos) {
+  if (edgeTransitionLocked || !currentAreaId) return;
+  const areaDef = AREAS[currentAreaId];
+  if (!areaDef || !areaDef.connections) return;
+
+  let dir = null;
+  if (playerPos.x < -EDGE_THRESHOLD && areaDef.connections.left)  dir = 'left';
+  if (playerPos.x >  EDGE_THRESHOLD && areaDef.connections.right) dir = 'right';
+  if (playerPos.z < -EDGE_THRESHOLD && areaDef.connections.top)   dir = 'top';
+  if (playerPos.z >  EDGE_THRESHOLD && areaDef.connections.bottom) dir = 'bottom';
+
+  if (!dir) return;
+
+  edgeTransitionLocked = true;
+  navigateTo(areaDef.connections[dir], dir).then(() => {
+    edgeTransitionLocked = false;
+  });
+}
