@@ -15,6 +15,7 @@ export const NPC_DEFS = {
     bodyColor: 0xf5f5f5,
     questId: 'lost-carrot',
     modelPath: 'animals/bunny.glb',
+    modelScale: 0.5,
   },
   unicorn: {
     name: 'Unicorn 🦄',
@@ -32,6 +33,7 @@ export const NPC_DEFS = {
     bodyColor: 0x6495ed,
     questId: 'build-nest',
     modelPath: 'animals/bird.glb',
+    modelScale: 0.5,
   },
   frog: {
     name: 'Frog 🐸',
@@ -41,6 +43,7 @@ export const NPC_DEFS = {
     bodyColor: 0x32cd32,
     questId: 'frog-crown',
     modelPath: 'animals/frog.glb',
+    modelScale: 0.3,
   },
   fox: {
     name: 'Fox Cub 🦊',
@@ -81,6 +84,11 @@ async function createNPCMesh(def) {
     // Load real GLB model
     const gltf = await loadModel(def.modelPath);
     group = gltf.scene.clone();
+
+    // Scale down models to appropriate size (models are often huge)
+    const modelScale = def.modelScale || 0.5;
+    group.scale.setScalar(modelScale);
+
     group.traverse((child) => {
       if (child.isMesh) {
         child.castShadow = true;
